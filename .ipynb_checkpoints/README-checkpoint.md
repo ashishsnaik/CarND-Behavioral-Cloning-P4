@@ -13,6 +13,7 @@ In this project, my goal is to develop a ConvNet model in Keras to predict the s
 #### **Project Write Up:** [writeup_report.md](./writeup_report.md)
 #### **Project Code (ipynb):** [model.ipynb](./model.ipynb)
 #### **Project Code (HTML):** [model.html](./model.html)
+#### **Trained Model (h5):** [model.h5](./model/model.mp4)
 #### **Output Video (mp4):** [video.mp4](./video/video.mp4)
 
 
