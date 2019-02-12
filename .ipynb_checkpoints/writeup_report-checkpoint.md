@@ -68,7 +68,7 @@ More details on the model architecture to follow.
 
 #### 2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting, and was trained and validated on different data sets to ensure that the model was not overfitting. The model training code and output can be found in `model.ipynb` section `Model Training`. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track. The video of the final simulator test run can be found in the `video` folder.
+The model contains dropout layers in order to reduce overfitting, and was trained and validated on different data sets to ensure that the model was not overfitting. The model training code and output can be found in `model.ipynb` section `Model Training`. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track. The video of the final simulator test run can be found in the `video/` folder.
 
 #### 3. Model parameter tuning
 
@@ -90,9 +90,9 @@ I used the pretrained VGG16 model in Keras without including the top (Dense laye
 
 In order to gauge how well the model was working, I split my image and steering angle data into a training and validation sets with 27686 (80%) and 6922 (20%) images respectively. My initial goal was to, without using any regularization technique, overfit the model so as to ensure that I have a good enough model architecture. My initial training runs of the model had a low mean squared error on the training set but a high mean squared error on the validation set, which indicated that the model was overfitting. Then, I added Dropout layers, with 50% dropout rate, as a regularization technique, which gave me good results. I also added BatchNormalization layer to the Dense layers.
 
-After every few epochs (multiples of 10), I tested the model by running it on the simulator. Initially, I was using only the lane-center driving behavior images to train the initial model, which took the car of the track a few times. So, I generated and added a set of images that exhibited recovery behavior and that took care of the car going really off the track. Though, the vehicle did go a little offtrack before recovering. Though, training  the model for more epochs took care of that.
+After every few epochs (multiples of 10), I tested the model by running it on the simulator. Initially, I was using only the lane-center driving behavior images to train the initial model, which took the car off the track a few times. So, I generated and added a set of images that exhibited recovery behavior and that took care of the car going really off the track. Though, the vehicle did go a little offtrack before recovering. Training  the model for more epochs took care of that.
 
-At the end of the process, the vehicle was able to drive autonomously around the track without leaving the road. The video of the simulator test run can be found in the `video` folder.
+At the end of the process, the vehicle was able to drive autonomously around the track without leaving the road. The video of the simulator test run can be found in the `video/` folder.
 
 #### 2. Final Model Architecture
 
@@ -145,11 +145,9 @@ My final model, which is defined in the function `get_vgg_based_model` in the mo
 
 #### 3. Creation of the Training Set & Training Process
 
-This gave me a total of 34608 center camera images using the Udacity provided simulator. These images were divided into two sets of 27686 (80%) and 6922 (20%) images as training and validation data respectively.
+To capture good driving behavior, I first recorded over four laps in anticlockwise direction on track one using center lane driving. Udacity had already provided sample image data that show good driving behavior in the clockwise direction. I added that to the good driving behavior data in order to prevent the model from having an anticlockwise direction bias.
 
-To capture good driving behavior, I first recorded over four laps in anticlockwise direction on track one using center lane driving. Udacity had already provided sample image data that show good driving behavior in the clockwise direction. I added that to the good driving behavior data in order to prevent the model from having an anticlock direction bias.
-
-Another way to avoid anticlockwise direction bias, would have been to augment the data with left-right flipped images. I tried using this approach, but the it wasn't of much help, probably because driving data for both, clockwise and anticlockwise, directions was already present. The custom image data generator implementation that I used to augment the data can be found in the function `trainGeneratorFunction` in model.ipynb, section `Data Generation and Augmentation`. 
+Another way to avoid anticlockwise direction bias, would have been to augment the data with left-right flipped images. I tried using this approach, but it wasn't of much help, probably because driving data for both, clockwise and anticlockwise, directions was already present. A custom image data generator that I implemented and used to augment the data can be found in the function `trainGeneratorFunction` in model.ipynb, section `Data Generation and Augmentation`. 
 
 Here is an example image of center lane driving in both, clock wise and anitclock wise directions:
 
@@ -157,16 +155,16 @@ Anti-clockwise Good Riding | Clockwise Good Riding
 :-------------------------:|:----------------------------:
 ![][image1]                |![][image2]
 
-I then recorded the vehicle recovering from the left and right sides of the road back to center, so that the vehicle would learn to prevent from going off the track or would recover in time in case it does drive over the track/lane lines. I also recorded other recovery cases, such as heading back to the center of the lane, in case the vehicle is heading left or right while approaching or getting off the bridge.
+I then recorded the vehicle recovering from the left and right sides of the road back to center, so that the model would learn to prevent the vehicle from going off the track and/or would recover in time in case it does drive over the track/lane lines. I also recorded other recovery cases, such as steering back to the center of the lane in case the vehicle is heading left or right while approaching or getting off the bridge.
 
 Below images, titled with their steering angles, show what a recovery looks like starting from the vehicle on the left track and driving back to the center of the track:
 
 ![alt text][image3]
 
-After the collection process, I had a total of 34608 images. I then read the images and the respective steering measurements, using the `driving_log.csv`, shuffled the data, and saved it into a `h5py` file for future loading. The implementation can be found in `model.ipynb`, in section `Prepare and Save Dataset`.
+After the data collection process, I had a total of 34608 images. I then read the images, and their respective steering measurements, using the `driving_log.csv` generated by the simulator. I shuffled the data, and saved it into a `h5py` file for future loading. The implementation can be found in `model.ipynb`, in section `Prepare and Save Dataset`.
 
-After loading the already shuffled data, I put aside 20% (6922) images as validation set, the implementation of which is the `model.ipynb`, section `Load Dataset`. 
+After loading the already shuffled data, I divided it into two sets of 27686 (80%) and 6922 (20%) images as training and validation data respectively, the implementation of which can be found in the `model.ipynb`, section `Load Dataset`. 
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The model training took anywhere between 522 to 760 seconds for 1 epoch on my machine, with Nvidia GTX1070 GPU. As we can see from the training output under section `Model Training` in `model.ipynb`, the ideal number of epochs was around 40. Although the model 40 epochs shows a little bit of overfitting, it probably isn't much as it showed the best simulation test results, and is the one used to generate the video. It is also the one renamed to `model.h5` for submission, as required by the project naming conventions. 
+I used this training data for training the model. The validation set helped determine whether the model was over or under fitting. The model training took anywhere between 522 to 760 seconds for 1 epoch on my local machine with a Nvidia GTX1070 GPU. As we can see from the training output under section `Model Training` in `model.ipynb`, the ideal number of epochs was around 40. Although the model at 40 epochs shows a little bit of overfitting, it probably isn't much, as it showed the best simulation test results when driving the car in autonomous mode. I used this model at 40 epochs to generate the video and it is also the one renamed to `model.h5` for submission, as required by the project naming conventions.
 
-As an observation, the `model_ep60.h5`, when run on the simulator, showed few jerky vehicle movements when approaching the sides or turning, and also drove over the lane lines at a few locations. If we see in the training log, after 50 epochs (Epoch 10/20 in the ep41-60 run output), the overfitting seems to be increasing, and this could possibly be the reason for the jerky movements I saw in the autonomous drive test for model_ep60.h5.
+As an observation, the `model_ep60.h5`, when run on the simulator, showed few jerky vehicle movements when approaching the sides, or turning, and also drove over the lane lines at a few locations. If we see in the training log, after 50 epochs (Epoch 10/20 in the ep41-60 run output), the overfitting seems to be increasing, and this could possibly be the reason for the jerky movements I saw in the autonomous drive test for model_ep60.h5.
